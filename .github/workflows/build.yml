@@ -26,8 +26,14 @@ jobs:
         shell: bash
         run: |
           set +e
-          npx electron-builder --publish never 2>&1 | tee log.txt
-          c=${PIPESTATUS[0]}
+          # hdiutil trên máy chủ macOS thỉnh thoảng báo "resource busy": thử lại tối đa 3 lần
+          for i in 1 2 3; do
+            npx electron-builder --publish never 2>&1 | tee log.txt
+            c=${PIPESTATUS[0]}
+            [ "$c" -eq 0 ] && break
+            [ "$(uname)" = "Darwin" ] && { for v in /Volumes/MAS*; do hdiutil detach -force "$v" || true; done; }
+            rm -rf dist; sleep 10
+          done
           if [ "$c" -ne 0 ]; then echo "::error::$(tail -c 1800 log.txt | tr '\n' ' ')"; exit 1; fi
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
