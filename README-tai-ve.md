@@ -2,7 +2,7 @@
 
 Phần mềm quản lý bán hàng cho cửa hàng nhỏ, tạp hóa. Bán hàng, kho, in bill, công nợ, thu chi, khuyến mãi, báo cáo Excel. Chạy được khi mất mạng.
 
-**Dùng miễn phí cho cửa hàng của bạn. Không được bán, cho thuê, phân phối lại hay đổi tên đem bán.** © 2026 Nguyễn Tấn Tài (Missing).
+**Dùng miễn phí cho cửa hàng của bạn. Không được bán, cho thuê, phân phối lại hay đổi tên đem bán.** © 2026 Missing.
 
 ## Tải về
 

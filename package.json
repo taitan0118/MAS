@@ -1,9 +1,9 @@
 {
   "name": "mas-ban-hang",
   "productName": "MAS",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "MAS (Missing App Sales), phần mềm quản lý bán hàng cho cửa hàng nhỏ",
-  "author": "Nguyễn Tấn Tài (Missing)",
+  "author": "Missing",
   "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "main": "main.js",
@@ -27,7 +27,7 @@
   "build": {
     "appId": "vn.missing.mas",
     "productName": "MAS",
-    "copyright": "© 2026 Nguyễn Tấn Tài (Missing). Xem file LICENSE.",
+    "copyright": "© 2026 Missing. Xem file LICENSE.",
     "files": [
       "main.js",
       "app/**/*",
