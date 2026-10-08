@@ -18,7 +18,7 @@ git push origin v1.0.0
 ```
 Sau khi build xong, GitHub tự đưa lên kho công khai **trang tải về** (`index.html`, nhận ra máy iPhone, Android, Windows, Mac và hiện đúng nút) cùng **bản web của app** (thư mục `app`). Đại ca chỉ cần gửi cho khách **một đường dẫn trang tải về** đó.
 Vào tab **Actions** xem tiến trình (khoảng 10 đến 20 phút). Xong thì kho `MAS-tai-ve` có bản mới ở mục **Releases**, đại ca gửi đường dẫn đó cho khách tải.
-Muốn thử trước khi phát hành: tab Actions, chọn "Build bo cai MAS", bấm **Run workflow**. File build ra nằm ở mục Artifacts, chưa đăng công khai.
+Nếu không đẩy được tag: tab Actions, chọn "Build bo cai MAS", bấm **Run workflow**, nhập số phiên bản mới (ví dụ `v1.0.2`, không được trùng bản đã có) rồi chạy. Chạy tay cũng tự đăng Releases và trang tải về.
 
 ## Cập nhật nội dung app
 Sửa `app/index.html` (bản mới của MAS), tăng `version` trong `package.json`, rồi đẩy tag mới.

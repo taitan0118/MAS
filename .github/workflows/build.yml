@@ -5,6 +5,10 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Số phiên bản phát hành (chưa được dùng trước đó)'
+        default: 'v1.0.1'
 
 env:
   # Kho công khai chỉ chứa Releases (không chứa mã nguồn). Đổi tên nếu đại ca đặt khác.
@@ -125,8 +129,8 @@ jobs:
 
           Xem thêm Gioi-thieu-MAS.pdf (chức năng) và Huong-dan-Day-du.pdf. Dùng miễn phí cho cửa hàng của bạn, không được bán lại (LICENSE.txt).
           EOT
-          gh release create "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}" out/* --repo "$REL_REPO" \
-            --title "MAS ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}" --notes-file notes.md
+          gh release create "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}" out/* --repo "$REL_REPO" \
+            --title "MAS ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}" --notes-file notes.md
 
   trang-tai-ve:
     # Đưa trang tải về và bản web của app lên kho công khai (bật GitHub Pages cho kho đó).
@@ -146,5 +150,5 @@ jobs:
           cd site
           git config user.name "mas-ci"; git config user.email "mas-ci@users.noreply.github.com"
           git add -A
-          git commit -m "Cập nhật trang tải về ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}" || echo "Không có thay đổi"
+          git commit -m "Cập nhật trang tải về ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}" || echo "Không có thay đổi"
           git push
