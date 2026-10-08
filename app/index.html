@@ -1095,6 +1095,7 @@ function receiptModal(d) {
     (IS_APP ? '' : '<p class="muted sm">Bill xem trước khổ 58mm. Bản app cài trên máy sẽ in ra máy in nhiệt.</p>') +
     '<div class="dactions">' +
     (!o.voided && !d.fresh ? `<button type="button" class="btn danger" data-act="void" data-id="${o.id}">${ui.arm === 'void' + o.id ? 'Bấm lần nữa để hủy đơn' : 'Hủy đơn'}</button>` : '') +
+    (!d.fresh ? `<button type="button" class="btn danger" data-act="delorder" data-id="${o.id}">Xóa hóa đơn</button>` : '') +
     (IS_APP ? `<button type="button" class="btn" data-act="print" data-id="${o.id}">${svg(I.printer, 20)}In bill</button>` : '') +
     (d.fresh ? '<button type="button" class="btn primary grow" data-act="newsale" autofocus>Đơn mới</button>' : '<button type="button" class="btn primary grow" data-act="close">Đóng</button>') +
     '</div>';
@@ -1103,6 +1104,12 @@ function printOrder(id) {
   const o = findO(id); if (!o) return;
   $('#print-area').innerHTML = receiptHTML(o);
   window.print();
+}
+function deleteOrder(id) {
+  const o = findO(id); if (!o) return;
+  if (!o.voided) o.items.forEach(i => { const p = findP(i.pid); if (p) p.stock += i.qty; });
+  S.orders = S.orders.filter(x => x.id !== id); save(); closeModal(); render();
+  toast(`Đã xóa hóa đơn ${orderNo(o.no)}.`);
 }
 function voidOrder(id) {
   const o = findO(id); if (!o || o.voided) return;
@@ -1359,7 +1366,7 @@ function custModal(d) {
       '</div><button type="submit" class="btn primary">Ghi nhận thu nợ</button></form>' : '') +
     `<div><h3 class="h2" style="font-size:16px;margin-bottom:6px">Lịch sử</h3><div class="hist">${hist || '<p class="muted">Khách chưa mua đơn nào.</p>'}</div></div>` +
     '<div class="dactions">' +
-    (s.debt === 0 && !s.count ? `<button type="button" class="btn danger" data-act="delcust" data-id="${c.id}">${ui.arm === 'delc' + c.id ? 'Bấm lần nữa để xóa' : 'Xóa khách'}</button>` : '') +
+    `<button type="button" class="btn danger" data-act="delcust" data-id="${c.id}">Xóa khách</button>` +
     `<button type="button" class="btn" data-act="editcust" data-id="${c.id}">Sửa thông tin</button>` +
     `<button type="button" class="btn primary grow" data-act="sellto" data-id="${c.id}">Bán hàng cho khách này</button></div>`;
 }
@@ -1964,6 +1971,8 @@ document.addEventListener('click', e => {
     case 'close': case 'overlay': closeModal(); break;
     case 'newsale': closeModal(); ui.view = 'pos'; render(); break;
     case 'print': printOrder(id); break;
+    case 'delorder': { const o = findO(id); if (!o) break;
+      ask({ title: `Xóa hóa đơn ${orderNo(o.no)}?`, msg: o.voided ? 'Hóa đơn đã hủy sẽ bị xóa hẳn khỏi lịch sử. Không hoàn tác được.' : 'Hóa đơn sẽ bị xóa hẳn. Hàng trong đơn được trả lại kho, tiền thu, công nợ và doanh thu của đơn không còn tính nữa. Không hoàn tác được. Nếu chỉ muốn giữ lại lịch sử thì chọn Hủy đơn.', ok: 'Xóa hóa đơn' }, () => deleteOrder(id)); break; }
     case 'void': if (!confirm2('void' + id, () => voidOrder(id))) drawModal(); break;
     case 'openorder': openModal('receipt', { id }); break;
     case 'pf': ui.pf = v; render(); break;
@@ -1986,7 +1995,15 @@ document.addEventListener('click', e => {
       break;
     case 'opencust': openModal('cust', { id }); break;
     case 'editcust': ui.modal = { kind: 'custform', data: { id } }; drawModal(); break;
-    case 'delcust': if (!confirm2('delc' + id, () => { const c = findC(id); S.customers = S.customers.filter(x => x.id !== id); if (S.cart.customerId === id) S.cart.customerId = null; save(); closeModal(); render(); toast(`Đã xóa khách "${c ? c.name : ''}".`); })) drawModal(); break;
+    case 'delcust': { const c = findC(id); if (!c) break; const st = custStats(id);
+      const msg = (st.debt > 0 ? `Khách đang nợ ${fmt(st.debt)}. Xóa khách thì không còn theo dõi khoản nợ này nữa. ` : '') + (st.count ? `Khách đã mua ${st.count} đơn, các đơn cũ vẫn giữ nguyên trong lịch sử. ` : '') + 'Thông tin khách sẽ bị xóa khỏi danh sách.';
+      ask({ title: `Xóa khách "${c.name}"?`, msg, ok: 'Xóa khách' }, () => {
+        S.customers = S.customers.filter(x => x.id !== id);
+        S.orders.forEach(o => { if (o.customerId === id) o.customerId = null; });
+        S.cash.forEach(k => { if (k.customerId === id) k.customerId = null; });
+        if (S.cart.customerId === id) S.cart.customerId = null;
+        save(); closeModal(); render(); toast(`Đã xóa khách "${c.name}".`);
+      }); break; }
     case 'sellto': S.cart.customerId = id; save(); closeModal(); ui.view = 'pos'; render(); toast(`Đang bán cho ${findC(id).name}.`); break;
     case 'cf': ui.cf = v; render(); break;
     /* fund */
