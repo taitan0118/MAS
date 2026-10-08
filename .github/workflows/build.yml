@@ -8,7 +8,7 @@ on:
     inputs:
       version:
         description: 'Số phiên bản phát hành (chưa được dùng trước đó)'
-        default: 'v1.0.1'
+        default: 'v1.0.2'
 
 env:
   # Kho công khai chỉ chứa Releases (không chứa mã nguồn). Đổi tên nếu đại ca đặt khác.
