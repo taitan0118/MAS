@@ -1,0 +1,133 @@
+# Build file cài cho Windows, Mac, Android rồi đăng lên trang tải về công khai.
+# Chạy khi đẩy tag dạng v1.0.0, hoặc bấm tay trong tab Actions.
+name: Build bo cai MAS
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  # Kho công khai chỉ chứa Releases (không chứa mã nguồn). Đổi tên nếu đại ca đặt khác.
+  REL_REPO: taitan0118/MAS-tai-ve
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx electron-builder --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm install
+      - run: npx cap add android
+      - run: npx capacitor-assets generate --android --iconBackgroundColor '#0F172A' --splashBackgroundColor '#0F172A'
+      - run: npx cap sync android
+      - run: ./gradlew assembleDebug
+        working-directory: android
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk MAS-Android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: MAS-Android.apk
+
+  ios:
+    # File .ipa chưa ký: người dùng ký bằng Apple ID miễn phí qua Sideloadly hoặc AltStore.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx cap add ios
+      - run: npx capacitor-assets generate --ios --iconBackgroundColor '#0F172A' --splashBackgroundColor '#0F172A'
+      - run: npx cap sync ios
+      - name: Build không ký
+        run: |
+          if [ -d ios/App/App.xcworkspace ]; then T="-workspace ios/App/App.xcworkspace"; else T="-project ios/App/App.xcodeproj"; fi
+          xcodebuild $T -scheme App -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+          mkdir Payload && cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qr MAS-iPhone.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: MAS-iPhone.ipa
+
+  release:
+    needs: [desktop, android, ios]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - name: Gom PDF hướng dẫn và giấy phép
+        run: |
+          for f in Windows Mac May-POS Android iPad iPhone; do cp "huong-dan/MAS-Cai-$f.pdf" "out/Huong-dan-$f.pdf"; done
+          cp huong-dan/MAS-Gioi-thieu.pdf out/Gioi-thieu-MAS.pdf
+          cp huong-dan/MAS-Huong-dan-cai-dat.pdf out/Huong-dan-Day-du.pdf
+          cp LICENSE out/LICENSE.txt
+      - name: Đăng lên trang tải về
+        env:
+          GH_TOKEN: ${{ secrets.TAI_VE_TOKEN }}
+        run: |
+          ls -la out
+          cat > notes.md <<'EOT'
+          ## Chọn file theo máy của cửa hàng
+          | Máy | File cài | Hướng dẫn |
+          |---|---|---|
+          | Windows, POS Windows | MAS-Windows.exe | Huong-dan-Windows.pdf |
+          | Mac chip Apple (M1 trở lên) | MAS-Mac-arm64.dmg | Huong-dan-Mac.pdf |
+          | Mac chip Intel | MAS-Mac-x64.dmg | Huong-dan-Mac.pdf |
+          | Android, POS Android | MAS-Android.apk | Huong-dan-Android.pdf |
+          | iPhone | cài từ Safari (hoặc MAS-iPhone.ipa qua Sideloadly) | Huong-dan-iPhone.pdf |
+          | iPad | cài từ Safari | Huong-dan-iPad.pdf |
+          | Máy POS | như Windows hoặc Android | Huong-dan-May-POS.pdf |
+
+          Xem thêm Gioi-thieu-MAS.pdf (chức năng) và Huong-dan-Day-du.pdf. Dùng miễn phí cho cửa hàng của bạn, không được bán lại (LICENSE.txt).
+          EOT
+          gh release create "${{ github.ref_name }}" out/* --repo "$REL_REPO" \
+            --title "MAS ${{ github.ref_name }}" --notes-file notes.md
+
+  trang-tai-ve:
+    # Đưa trang tải về và bản web của app lên kho công khai (bật GitHub Pages cho kho đó).
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Đẩy trang tải về
+        env:
+          TOKEN: ${{ secrets.TAI_VE_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TOKEN}@github.com/${REL_REPO}.git" site
+          rm -rf site/app site/index.html
+          cp -r app site/app
+          cp tai-ve/index.html site/index.html
+          touch site/.nojekyll
+          cd site
+          git config user.name "mas-ci"; git config user.email "mas-ci@users.noreply.github.com"
+          git add -A
+          git commit -m "Cập nhật trang tải về ${{ github.ref_name }}" || echo "Không có thay đổi"
+          git push

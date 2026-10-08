@@ -1,0 +1,80 @@
+{
+  "name": "mas-ban-hang",
+  "productName": "MAS",
+  "version": "1.0.0",
+  "description": "MAS (Missing App Sales), phần mềm quản lý bán hàng cho cửa hàng nhỏ",
+  "author": "Nguyễn Tấn Tài (Missing)",
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/share": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "vn.missing.mas",
+    "productName": "MAS",
+    "copyright": "© 2026 Nguyễn Tấn Tài (Missing). Xem file LICENSE.",
+    "files": [
+      "main.js",
+      "app/**/*",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "LICENSE",
+        "to": "LICENSE.txt"
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "MAS-Windows.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "build/LICENSE.txt"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.business",
+      "identity": null,
+      "artifactName": "MAS-Mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "MAS ${version}"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "appId": "vn.missing.mas",
+  "appName": "MAS",
+  "webDir": "app",
+  "server": { "androidScheme": "https" },
+  "backgroundColor": "#0F172A"
+}
