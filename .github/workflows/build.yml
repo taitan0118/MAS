@@ -22,7 +22,13 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install
-      - run: npx electron-builder --publish never
+      - name: Build
+        shell: bash
+        run: |
+          set +e
+          npx electron-builder --publish never 2>&1 | tee log.txt
+          c=${PIPESTATUS[0]}
+          if [ "$c" -ne 0 ]; then echo "::error::$(tail -c 1800 log.txt | tr '\n' ' ')"; exit 1; fi
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
@@ -60,7 +66,12 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install
-      - run: npx cap add ios
+      - name: Thêm iOS
+        run: |
+          set +e
+          npx cap add ios 2>&1 | tee log.txt
+          c=${PIPESTATUS[0]}
+          if [ "$c" -ne 0 ]; then echo "::error::$(tail -c 1800 log.txt | tr '\n' ' ')"; exit 1; fi
       - run: npx capacitor-assets generate --ios --iconBackgroundColor '#0F172A' --splashBackgroundColor '#0F172A'
       - run: npx cap sync ios
       - name: Build không ký
