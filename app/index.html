@@ -1664,10 +1664,10 @@ function xlsxBlob(sheets) {
   const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
     '<numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0&quot; đ&quot;;-#,##0&quot; đ&quot;;&quot;-&quot;"/></numFmts>' +
     '<fonts count="6">' + font('', 11, 'FF0F172A') + font('<b/>', 11, 'FF0F172A') + font('<b/>', 11, 'FFFFFFFF') + font('<b/>', 16, 'FFFFFFFF') + font('<i/>', 10, 'FF64748B') + font('<b/>', 11, 'FF1E3A8A') + '</fonts>' +
-    '<fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' + fill('FF0F172A') + fill('FF2563EB') + fill('FFF1F5F9') + fill('FFDBEAFE') + '</fills>' +
+    '<fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' + '<fill><gradientFill degree="0"><stop position="0"><color rgb="FF0EA5E9"/></stop><stop position="1"><color rgb="FF14B8A6"/></stop></gradientFill></fill>' + fill('FF2563EB') + fill('FFEFF6FF') + fill('FFDBEAFE') + '</fills>' +
     '<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border>' +
-    `<border>${bd('FFCBD5E1')}<top style="thin"><color rgb="FFCBD5E1"/></top><bottom style="thin"><color rgb="FFCBD5E1"/></bottom><diagonal/></border>` +
-    `<border>${bd('FFCBD5E1')}<top style="medium"><color rgb="FF2563EB"/></top><bottom style="medium"><color rgb="FF2563EB"/></bottom><diagonal/></border></borders>` +
+    `<border>${bd('FFBFDBFE')}<top style="thin"><color rgb="FFBFDBFE"/></top><bottom style="thin"><color rgb="FFBFDBFE"/></bottom><diagonal/></border>` +
+    `<border>${bd('FFBFDBFE')}<top style="medium"><color rgb="FF2563EB"/></top><bottom style="medium"><color rgb="FF2563EB"/></bottom><diagonal/></border></borders>` +
     '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="15">' +
     '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
     xf(0, 3, 2, 0, `${LF} indent="1"`) + xf(0, 4, 0, 0, `${LF} indent="1"`) + xf(0, 2, 3, 1, `${CT} wrapText="1"`) +
@@ -1721,7 +1721,7 @@ async function exportExcel() {
       ['Đã giảm cho khách', R.promo], ['Tiền đã thu', R.paid], ['Ghi nợ trong kỳ', R.debt]] },
     { name: 'Theo ngày', tab: 'FF38BDF8', title: 'DOANH THU THEO NGÀY', sub, head: ['Ngày', 'Số đơn', 'Doanh thu', 'Lợi nhuận gộp'], types: ['c', 'n', 'm', 'm'], cols: [14, 10, 18, 18], filter: true, total: [1, 2, 3],
       rows: R.days.map(d => [d.label, d.cnt, d.rev, d.profit]) },
-    { name: 'Đơn hàng', tab: 'FF0F172A', title: 'DANH SÁCH ĐƠN HÀNG', sub, head: ['Số đơn', 'Thời gian', 'Khách hàng', 'Hình thức', 'Tạm tính', 'Giảm giá', 'Tổng tiền', 'Đã trả', 'Ghi nợ', 'Thu ngân'],
+    { name: 'Đơn hàng', tab: 'FF0EA5E9', title: 'DANH SÁCH ĐƠN HÀNG', sub, head: ['Số đơn', 'Thời gian', 'Khách hàng', 'Hình thức', 'Tạm tính', 'Giảm giá', 'Tổng tiền', 'Đã trả', 'Ghi nợ', 'Thu ngân'],
       types: ['c', 'c', 't', 't', 'm', 'm', 'm', 'm', 'm', 't'], cols: [10, 18, 20, 14, 14, 14, 15, 15, 14, 14], filter: true, land: true, total: [4, 5, 6, 7, 8],
       rows: R.orders.map(o => [orderNo(o.no), fmtTime(o.time), o.customerName || 'Khách lẻ', METHODS[o.method], o.subtotal, o.subtotal - o.total, o.total, o.paid != null ? o.paid : o.total, o.debt || 0, o.cashier]) },
     { name: 'Chi tiết hàng bán', tab: 'FF2563EB', title: 'CHI TIẾT HÀNG BÁN', sub, head: ['Số đơn', 'Thời gian', 'Hàng hóa', 'Số lượng', 'Đơn giá', 'Khuyến mãi mỗi món', 'Thành tiền'],
@@ -1946,7 +1946,7 @@ async function exportAll() {
       rows: S.customers.map(c => { const t = custStats(c.id); return [c.name, c.phone || '', t.count, t.spent, t.debt, c.note || '']; }) },
     { name: 'Sổ quỹ', tab: 'FF22C55E', title: 'SỔ QUỸ THU CHI', sub, head: ['Thời gian', 'Loại', 'Nhóm', 'Hình thức', 'Số tiền', 'Ghi chú'], types: ['c', 'c', 't', 't', 'm', 't'], cols: [18, 10, 18, 14, 16, 36], filter: true, total: [4],
       rows: S.cash.slice().sort((a, b) => a.time - b.time).map(k => [fmtTime(k.time), k.type === 'in' ? 'Thu' : 'Chi', k.cat, FUND_METHODS[k.method] || '', k.amount, k.note || '']) },
-    { name: 'Đơn hàng', tab: 'FF0F172A', title: 'TẤT CẢ ĐƠN HÀNG', sub, head: ['Số đơn', 'Thời gian', 'Khách hàng', 'Hình thức', 'Tổng tiền', 'Đã trả', 'Ghi nợ', 'Thu ngân', 'Trạng thái'], types: ['c', 'c', 't', 't', 'm', 'm', 'm', 't', 'c'], cols: [10, 18, 20, 14, 15, 15, 14, 14, 12], filter: true, land: true,
+    { name: 'Đơn hàng', tab: 'FF0EA5E9', title: 'TẤT CẢ ĐƠN HÀNG', sub, head: ['Số đơn', 'Thời gian', 'Khách hàng', 'Hình thức', 'Tổng tiền', 'Đã trả', 'Ghi nợ', 'Thu ngân', 'Trạng thái'], types: ['c', 'c', 't', 't', 'm', 'm', 'm', 't', 'c'], cols: [10, 18, 20, 14, 15, 15, 14, 14, 12], filter: true, land: true,
       rows: S.orders.map(o => [orderNo(o.no), fmtTime(o.time), o.customerName || 'Khách lẻ', METHODS[o.method] || '', o.total, o.paid != null ? o.paid : o.total, o.debt || 0, o.cashier || '', o.voided ? 'Đã hủy' : 'Hoàn tất']) },
     { name: 'Chi tiết hàng bán', tab: 'FF2563EB', title: 'CHI TIẾT HÀNG BÁN', sub, head: ['Số đơn', 'Thời gian', 'Hàng hóa', 'Số lượng', 'Đơn giá', 'Khuyến mãi mỗi món', 'Thành tiền'], types: ['c', 'c', 't', 'n', 'm', 'm', 'm'], cols: [10, 18, 28, 10, 14, 18, 16], filter: true, land: true, rows: items }
   ]);
