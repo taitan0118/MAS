@@ -30,6 +30,8 @@ jobs:
         shell: bash
         run: |
           set +e
+          # Tắt Spotlight để nó không giữ ổ đĩa tạm khi tạo .dmg
+          [ "$(uname)" = "Darwin" ] && sudo mdutil -a -i off >/dev/null 2>&1
           # hdiutil trên máy chủ macOS thỉnh thoảng báo "resource busy": thử lại tối đa 3 lần
           for i in 1 2 3; do
             npx electron-builder --publish never 2>&1 | tee log.txt
