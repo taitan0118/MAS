@@ -327,6 +327,20 @@ img.tile{object-fit:cover;background:var(--surface-2)}
   #print-area{display:block}
   #print-area .receipt{width:58mm;padding:4mm 3mm}
 }
+/* ===== Giao diện tươi theo MAO ===== */
+:root{--bg:#F1F6FF;--nav-ink:rgba(255,255,255,.82);--nav-active:rgba(255,255,255,.22);--line:#DCE6F5;--shadow:0 2px 12px rgba(37,99,235,.09)}
+.nav{background:linear-gradient(180deg,#2563EB 0%,#0EA5E9 100%)}
+.nav button:hover{background:rgba(255,255,255,.12)}
+.nav button[aria-current="page"] svg{color:#fff}
+.btn.primary{background:linear-gradient(135deg,#2563EB,#1D4ED8);border-color:transparent;box-shadow:0 4px 14px rgba(37,99,235,.35)}
+.btn.primary:hover{background:linear-gradient(135deg,#3B82F6,#2563EB);border-color:transparent}
+.btn.primary:disabled{box-shadow:none}
+.card,.panel{border-radius:16px;border-color:transparent;box-shadow:var(--shadow)}
+.card:hover{box-shadow:0 6px 18px rgba(37,99,235,.18)}
+.chip{border-color:transparent;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,#2563EB,#0EA5E9);border-color:transparent;color:#fff}
+.pill{background:#fff;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.mbar{background:linear-gradient(90deg,#2563EB,#0EA5E9)}
 </style>
 </head>
 <body>
