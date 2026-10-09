@@ -112,6 +112,7 @@ jobs:
           for f in Windows Mac May-POS Android iPad iPhone; do cp "huong-dan/MAS-Cai-$f.pdf" "out/Huong-dan-$f.pdf"; done
           cp huong-dan/MAS-Gioi-thieu.pdf out/Gioi-thieu-MAS.pdf
           cp huong-dan/MAS-Huong-dan-cai-dat.pdf out/Huong-dan-Day-du.pdf
+          cp huong-dan/MAS-Huong-dan-su-dung.pdf out/Huong-dan-Su-dung.pdf
           cp LICENSE out/LICENSE.txt
       - name: Đăng lên trang tải về
         env:
@@ -130,7 +131,7 @@ jobs:
           | iPad | cài từ Safari | Huong-dan-iPad.pdf |
           | Máy POS | như Windows hoặc Android | Huong-dan-May-POS.pdf |
 
-          Xem thêm Gioi-thieu-MAS.pdf (chức năng) và Huong-dan-Day-du.pdf. Dùng miễn phí cho cửa hàng của bạn, không được bán lại (LICENSE.txt).
+          Xem thêm Huong-dan-Su-dung.pdf (cách dùng từng bước), Gioi-thieu-MAS.pdf (chức năng) và Huong-dan-Day-du.pdf (cài đặt). Dùng miễn phí cho cửa hàng của bạn, không được bán lại (LICENSE.txt).
           EOT
           gh release create "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}" out/* --repo "$REL_REPO" \
             --title "MAS ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.version }}" --notes-file notes.md
