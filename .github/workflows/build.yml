@@ -8,7 +8,7 @@ on:
     inputs:
       version:
         description: 'Số phiên bản phát hành (chưa được dùng trước đó)'
-        default: 'v1.0.12'
+        default: 'v1.0.13'
 
 env:
   # Kho công khai chỉ chứa Releases (không chứa mã nguồn). Đổi tên nếu đại ca đặt khác.
@@ -43,6 +43,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: desktop-${{ matrix.os }}
           path: |
             dist/*.exe
@@ -65,6 +66,7 @@ jobs:
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk MAS-Android.apk
       - uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: android
           path: MAS-Android.apk
 
@@ -93,6 +95,7 @@ jobs:
           zip -qr MAS-iPhone.ipa Payload
       - uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: ios
           path: MAS-iPhone.ipa
 
